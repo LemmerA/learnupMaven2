@@ -38,7 +38,7 @@ class TaxManagerTest {
         TaxManager account = new TaxManager();
         account.addIncome(Long.MAX_VALUE - 1000);
         account.addIncome(5000);
-        account.addIncome(5000);
+        account.addIncome(Long.MAX_VALUE - 1);
         assertEquals(Long.MAX_VALUE, account.getIncome());
     }
 
@@ -74,8 +74,8 @@ class TaxManagerTest {
     public void addExpenseNoOverflow(){
         TaxManager account = new TaxManager();
         account.addExpense(Long.MAX_VALUE - 1000);
-        account.addExpense(100000);
-        account.addExpense(-1);
+        account.addIncome(500000);
+        account.addIncome(Long.MAX_VALUE - 100);
         assertEquals(Long.MAX_VALUE, account.getExpense());
     }
 
