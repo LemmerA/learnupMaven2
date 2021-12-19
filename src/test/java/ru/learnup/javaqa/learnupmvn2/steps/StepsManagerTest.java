@@ -1,6 +1,7 @@
 package ru.learnup.javaqa.learnupmvn2.steps;
 
 import org.junit.jupiter.api.Test;
+import ru.learnup.javaqa.learnupmvn2.exception.*;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -30,8 +31,8 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 11);
-        stepsManager.add(78, 32);
-        assertEquals("{1=10, 3=11, 78=32}", mapToString(stepsManager));
+        stepsManager.add(365, 32);
+        assertEquals("{1=10, 3=11, 365=32}", mapToString(stepsManager));
     }
 
     @Test
@@ -39,32 +40,40 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 23);
-        stepsManager.add(78, 11);
-        stepsManager.add(3, 1);
-        stepsManager.add(3, 12);
-        stepsManager.add(3, 19);
-        assertEquals("{1=10, 3=65, 78=34}", mapToString(stepsManager));
+        stepsManager.add(365, 1);
+        stepsManager.add(365, 12);
+        stepsManager.add(365, 19);
+        assertEquals("{1=10, 3=33, 365=32}", mapToString(stepsManager));
     }
 
     @Test
-    public void addNegativeDay(){
+    public void addDayNegative(){
         StepsManager stepsManager = new StepsManager();
-        stepsManager.add(-1, 10);
-        stepsManager.add(0, 33);
-        stepsManager.add(-78, 34);
-        stepsManager.add(Integer.MIN_VALUE, 32);
-        assertEquals("{}", mapToString(stepsManager));
+        assertThrows(IllegalDayException.class, () -> stepsManager.add(-1, 10));
     }
 
     @Test
-    public void addNegativeSteps(){
+    public void addDayZero(){
         StepsManager stepsManager = new StepsManager();
-        stepsManager.add(1, -10);
-        stepsManager.add(3, 0);
-        stepsManager.add(78, -34);
-        stepsManager.add(3, Integer.MIN_VALUE);
-        assertEquals("{}", mapToString(stepsManager));
+        assertThrows(IllegalDayException.class, () -> stepsManager.add(0, 10));
+    }
+
+    @Test
+    public void addDayTooLarge(){
+        StepsManager stepsManager = new StepsManager();
+        assertThrows(IllegalDayException.class, () -> stepsManager.add(366, 10));
+    }
+
+    @Test
+    public void addStepsNegative(){
+        StepsManager stepsManager = new StepsManager();
+        assertThrows(IllegalStepsException.class, () -> stepsManager.add(1, -10));
+    }
+
+    @Test
+    public void addStepsZero(){
+        StepsManager stepsManager = new StepsManager();
+        assertThrows(IllegalStepsException.class, () -> stepsManager.add(1, 0));
     }
 
     @Test
@@ -89,7 +98,7 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 1);
+        stepsManager.add(365, 1);
         assertEquals(33, stepsManager.getStepsRecord());
     }
 
@@ -98,22 +107,12 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 23);
-        stepsManager.add(78, 11);
+        stepsManager.add(365, 23);
+        stepsManager.add(365, 11);
         stepsManager.add(3, 1);
         stepsManager.add(3, 12);
         stepsManager.add(3, 19);
         assertEquals(65, stepsManager.getStepsRecord());
-    }
-
-    @Test
-    public void stepsRecordNegative(){
-        StepsManager stepsManager = new StepsManager();
-        stepsManager.add(-1, 10);
-        stepsManager.add(3, -33);
-        stepsManager.add(0, 34);
-        stepsManager.add(3, 0);
-        assertEquals(0, stepsManager.getStepsRecord());
     }
 
     @Test
@@ -146,7 +145,7 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 1);
+        stepsManager.add(365, 1);
         assertEquals(24, stepsManager.remainder(1));
     }
 
@@ -155,8 +154,8 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 23);
-        stepsManager.add(78, 11);
+        stepsManager.add(365, 23);
+        stepsManager.add(365, 11);
         stepsManager.add(3, 1);
         stepsManager.add(3, 12);
         stepsManager.add(3, 19);//65
@@ -168,7 +167,7 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 34);
+        stepsManager.add(365, 34);
         stepsManager.add(3, 32); //65
         assertEquals(1, stepsManager.remainder(3));
     }
@@ -178,8 +177,8 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 23);
-        stepsManager.add(78, 11);
+        stepsManager.add(365, 23);
+        stepsManager.add(365, 11);
         stepsManager.add(3, 1);
         stepsManager.add(3, 12);
         stepsManager.add(3, 19);//65
@@ -187,30 +186,30 @@ class StepsManagerTest {
     }
 
     @Test
-    public void remainderNegativeDay(){
+    public void remainderDayNegative(){
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 1);
+        stepsManager.add(365, 1);
         assertEquals(-1, stepsManager.remainder(-1));
     }
 
     @Test
-    public void remainderZeroDay(){
+    public void remainderDayZero(){
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(78, 1);
+        stepsManager.add(365, 1);
         assertEquals(-1, stepsManager.remainder(0));
     }
 
     @Test
-    public void remainderMaxDay(){
+    public void remainderDayTooLarge(){
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 33);
-        stepsManager.add(Integer.MAX_VALUE, 1);
-        assertEquals(33, stepsManager.remainder(Integer.MAX_VALUE));
+        stepsManager.add(365, 1);
+        assertEquals(-1, stepsManager.remainder(366));
     }
 
     //compareTo tests
@@ -229,7 +228,7 @@ class StepsManagerTest {
         p1.add(3, 7);
         p1.add(3, 7);
         p2.add(1, 1);
-        p2.add(123, 0);
+        p2.add(365, 1);
         p2.add(32, 3);
         assertTrue(p1.compareTo(p2) > 0);
     }
@@ -238,11 +237,11 @@ class StepsManagerTest {
     public void compareP2(){
         StepsManager p1 = new StepsManager();
         StepsManager p2 = new StepsManager();
-        p1.add(3, -7);
+        p1.add(3, 7);
         p1.add(3, 7);
         p2.add(1, 1);
-        p2.add(123, -100);
-        p2.add(32, 30);
+        p2.add(365, 100);
+        p2.add(32, 3);
         assertTrue(p2.compareTo(p1) > 0);
     }
 
@@ -253,9 +252,9 @@ class StepsManagerTest {
         p1.add(3, 1);
         p1.add(3, 2);
         p1.add(3, 3);
-        p2.add(123, 1);
+        p2.add(365, 1);
         p2.add(32, 2);
-        p2.add(2, 3);
+        p2.add(1, 3);
         assertEquals(0, p1.compareTo(p2));
     }
 
@@ -266,7 +265,7 @@ class StepsManagerTest {
         p1.add(3, Integer.MAX_VALUE);
         p1.add(3, 10);
         p1.add(3, Integer.MAX_VALUE);
-        p2.add(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        p2.add(365, Integer.MAX_VALUE);
         p2.add(32, Integer.MAX_VALUE);
         p2.add(1, Integer.MAX_VALUE);
         assertTrue(p1.compareTo(p2) < 0);
@@ -285,8 +284,20 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 11);
-        stepsManager.add(78, 32);
-        assertEquals("[3, 78]", streamToString(stepsManager.getAllAbove(10)));
+        stepsManager.add(365, 32);
+        assertEquals("[3, 365]", streamToString(stepsManager.getAllAbove(10)));
+    }
+
+    @Test
+    public void getAllAboveRewrite(){
+        StepsManager stepsManager = new StepsManager();
+        stepsManager.add(1, 1);
+        stepsManager.add(1, 8);
+        stepsManager.add(3, 1);
+        stepsManager.add(3, 10);
+        stepsManager.add(365, 32);
+        stepsManager.add(365, 32);
+        assertEquals("[3, 365]", streamToString(stepsManager.getAllAbove(10)));
     }
 
     @Test
@@ -294,18 +305,8 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 11);
-        stepsManager.add(78, 32);
+        stepsManager.add(365, 32);
         assertEquals("[]", streamToString(stepsManager.getAllAbove(100)));
-    }
-
-    @Test
-    public void getAllAboveNegative(){
-        StepsManager stepsManager = new StepsManager();
-        stepsManager.add(-1, 10);
-        stepsManager.add(3, -11);
-        stepsManager.add(0, 32);
-        stepsManager.add(2, 0);
-        assertEquals("[]", streamToString(stepsManager.getAllAbove(-100)));
     }
 
     @Test
@@ -313,8 +314,8 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 11);
-        stepsManager.add(78, 32);
-        assertEquals("[1, 3, 78]", streamToString(stepsManager.getAllAbove(-100)));
+        stepsManager.add(365, 32);
+        assertEquals("[1, 3, 365]", streamToString(stepsManager.getAllAbove(-100)));
     }
 
     @Test
@@ -322,8 +323,8 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 1);
         stepsManager.add(3, 11);
-        stepsManager.add(78, 0);
-        assertEquals("[1, 3]", streamToString(stepsManager.getAllAbove(0)));
+        stepsManager.add(365, 1);
+        assertEquals("[1, 3, 365]", streamToString(stepsManager.getAllAbove(0)));
     }
 
     @Test
@@ -331,7 +332,7 @@ class StepsManagerTest {
         StepsManager stepsManager = new StepsManager();
         stepsManager.add(1, 10);
         stepsManager.add(3, 11);
-        stepsManager.add(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        stepsManager.add(365, Integer.MAX_VALUE);
         assertEquals("[]", streamToString(stepsManager.getAllAbove(Integer.MAX_VALUE)));
     }
 

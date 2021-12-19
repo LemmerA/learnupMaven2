@@ -2,6 +2,8 @@ package ru.learnup.javaqa.learnupmvn2.steps;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.learnup.javaqa.learnupmvn2.exception.IllegalStepsException;
+import ru.learnup.javaqa.learnupmvn2.exception.IllegalDayException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,8 +16,12 @@ public class StepsManager implements Comparable<StepsManager>{
     private int stepsRecord = 0;
 
     public void add(int day, int steps) {
-        if (steps <= 0 || day <= 0){
-            return;
+        if (steps <= 0){
+            throw new IllegalStepsException(steps);
+        }
+
+        if (day < 1 || day > 365) {
+            throw new IllegalDayException(day);
         }
 
         Integer valueCheck = stats.putIfAbsent(day, steps);
@@ -38,7 +44,7 @@ public class StepsManager implements Comparable<StepsManager>{
     }
 
     public int remainder(int day) {
-        if (day <= 0) {
+        if (day < 1 || day > 365) {
             return -1;
         }
 

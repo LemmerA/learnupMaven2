@@ -12,7 +12,7 @@ public class StepsBattle {
     private StepsManager p2;
 
     public void addSteps (StepsManager player, int day, int steps) {
-        if (!(player == p1 || player == p2) || day <= 0 || steps <= 0) {
+        if (!(player == p1 || player == p2)) {
             return;
         }
         player.add(day, steps);
