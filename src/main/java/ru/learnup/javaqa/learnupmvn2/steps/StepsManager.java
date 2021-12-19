@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Getter
 @NoArgsConstructor
-public class StepsManager {
+public class StepsManager implements Comparable<StepsManager>{
     private Map<Integer, Integer> stats = new HashMap<>();
     private int stepsRecord = 0;
 
@@ -24,7 +24,12 @@ public class StepsManager {
                 stepsRecord = steps;
             }
         } else {
-            stats.put(day, valueCheck = Math.round(valueCheck + (float)steps));
+            try {
+                valueCheck = Math.addExact(valueCheck, steps);
+            } catch (ArithmeticException e) {
+                valueCheck = Integer.MAX_VALUE;
+            }
+            stats.put(day, valueCheck);
             if (valueCheck > stepsRecord){
                 stepsRecord = valueCheck;
             }
@@ -32,10 +37,29 @@ public class StepsManager {
     }
 
     public int remainder(int day) {
-        if (day <= 0){
+        if (day <= 0) {
             return -1;
         }
 
-        return Math.round(stepsRecord - stats.getOrDefault(day, 0) + 1.0f);
+        try {
+        return Math.addExact(stepsRecord - stats.getOrDefault(day, 0), 1);
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    @Override
+    public int compareTo(StepsManager manager) {
+        long counterP1 = 0;
+        for(Map.Entry<Integer, Integer> day: this.getStats().entrySet()){
+            counterP1 += day.getValue();
+        }
+
+        long counterP2 = 0;
+        for(Map.Entry<Integer, Integer> day: manager.getStats().entrySet()){
+            counterP2 += day.getValue();
+        }
+
+        return Long.compare(counterP1, counterP2);
     }
 }
