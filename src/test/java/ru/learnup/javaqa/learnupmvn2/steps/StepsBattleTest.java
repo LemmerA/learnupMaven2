@@ -13,6 +13,7 @@ class StepsBattleTest {
     StepsManager p2 = Mockito.mock(StepsManager.class);
 
     //addSteps tests
+
     @Test
     public void addStepsP1(){
         StepsBattle stepsBattle = new StepsBattle(p1, p2);
@@ -35,25 +36,8 @@ class StepsBattleTest {
         verify(p3, never()).add(anyInt(), anyInt());
     }
 
-    @Test
-    public void addStepsNegativeDay(){
-        StepsBattle stepsBattle = new StepsBattle(p1, p2);
-        stepsBattle.addSteps(stepsBattle.getP1(), -1, 123);
-        stepsBattle.addSteps(stepsBattle.getP2(), 0, 123);
-        verify(p1, never()).add(anyInt(), anyInt());
-        verify(p2, never()).add(anyInt(), anyInt());
-    }
-
-    @Test
-    public void addStepsNegativeSteps(){
-        StepsBattle stepsBattle = new StepsBattle(p1, p2);
-        stepsBattle.addSteps(stepsBattle.getP1(), 1, -123);
-        stepsBattle.addSteps(stepsBattle.getP2(), 3, 0);
-        verify(p1, never()).add(anyInt(), anyInt());
-        verify(p2, never()).add(anyInt(), anyInt());
-    }
-
     //winner tests
+
     @Test
     public void winnerInit(){
         StepsBattle stepsBattle = new StepsBattle(p1, p2);

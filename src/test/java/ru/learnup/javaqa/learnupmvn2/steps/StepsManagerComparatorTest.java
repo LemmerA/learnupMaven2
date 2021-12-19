@@ -46,12 +46,12 @@ class StepsManagerComparatorTest {
     public void stepsCompDraw(){
         StepsManager p1 = new StepsManager();
         StepsManager p2 = new StepsManager();
-        p1. add(1, -11);
-        p1. add(2, 0);
-        p1. add(3, 13);
-        p2. add(1, -11);
-        p2. add(2, 10);
-        p2. add(3, 13);
+        p1. add(1, 11);
+        p1. add(2, 10);
+        p1. add(365, 13);
+        p2. add(1, 10);
+        p2. add(20, 11);
+        p2. add(31, 13);
         assertEquals(0, comp.compare(p2, p1));
     }
 
@@ -61,10 +61,10 @@ class StepsManagerComparatorTest {
         StepsManager p2 = new StepsManager();
         StepsManagerComparator compMax = new StepsManagerComparator(Integer.MAX_VALUE);
         p1. add(1, Integer.MAX_VALUE);
-        p1. add(Integer.MAX_VALUE, 1);
+        p1. add(365, 1);
         p1. add(1, Integer.MAX_VALUE);
         p2. add(1, 1);
-        p2. add(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        p2. add(365, Integer.MAX_VALUE);
         p2. add(1, Integer.MAX_VALUE);
         assertEquals(0, compMax.compare(p2, p1));
     }
@@ -74,12 +74,13 @@ class StepsManagerComparatorTest {
         StepsManagerComparator compZero = new StepsManagerComparator(0);
         StepsManager p1 = new StepsManager();
         StepsManager p2 = new StepsManager();
-        p1. add(1, 0);
+        p1. add(1, 1);
         p1. add(2, 1);
         p1. add(3, 13);
         p2. add(1, 1);
         p2. add(2, 12);
         p2. add(3, 13);
+        p2. add(4, 100);
         assertTrue(compZero.compare(p1, p2) < 0);
     }
 
@@ -88,12 +89,13 @@ class StepsManagerComparatorTest {
         StepsManagerComparator compNeg = new StepsManagerComparator(-100);
         StepsManager p1 = new StepsManager();
         StepsManager p2 = new StepsManager();
-        p1. add(1, 0);
+        p1. add(1, 1);
         p1. add(2, 1);
         p1. add(3, 13);
         p2. add(1, 1);
         p2. add(2, 12);
         p2. add(3, 13);
+        p2. add(4, 100);
         assertTrue(compNeg.compare(p1, p2) < 0);
     }
 }
