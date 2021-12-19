@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Getter
 @NoArgsConstructor
@@ -61,5 +62,12 @@ public class StepsManager implements Comparable<StepsManager>{
         }
 
         return Long.compare(counterP1, counterP2);
+    }
+
+    public Stream<Integer> getAllAbove(int steps) {
+        return this.getStats().entrySet()
+                .stream()
+                .filter(s -> s.getValue() > steps)
+                .map(Map.Entry::getKey);
     }
 }

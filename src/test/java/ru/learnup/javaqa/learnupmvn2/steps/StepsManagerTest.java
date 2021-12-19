@@ -2,15 +2,27 @@ package ru.learnup.javaqa.learnupmvn2.steps;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class StepsManagerTest {
 
+    private String mapToString(StepsManager manager){
+        return manager.getStats().toString();
+    }
+
+    private String streamToString(Stream<Integer> stream) {
+        return Arrays.toString(stream.toArray());
+    }
+
     //add tests
+
     @Test
     public void addInit(){
         StepsManager stepsManager = new StepsManager();
-        assertEquals("{}", stepsManager.getStats().toString());
+        assertEquals("{}", mapToString(stepsManager));
     }
 
     @Test
@@ -19,7 +31,7 @@ class StepsManagerTest {
         stepsManager.add(1, 10);
         stepsManager.add(3, 11);
         stepsManager.add(78, 32);
-        assertEquals("{1=10, 3=11, 78=32}", stepsManager.getStats().toString());
+        assertEquals("{1=10, 3=11, 78=32}", mapToString(stepsManager));
     }
 
     @Test
@@ -32,7 +44,7 @@ class StepsManagerTest {
         stepsManager.add(3, 1);
         stepsManager.add(3, 12);
         stepsManager.add(3, 19);
-        assertEquals("{1=10, 3=65, 78=34}", stepsManager.getStats().toString());
+        assertEquals("{1=10, 3=65, 78=34}", mapToString(stepsManager));
     }
 
     @Test
@@ -42,7 +54,7 @@ class StepsManagerTest {
         stepsManager.add(0, 33);
         stepsManager.add(-78, 34);
         stepsManager.add(Integer.MIN_VALUE, 32);
-        assertEquals("{}", stepsManager.getStats().toString());
+        assertEquals("{}", mapToString(stepsManager));
     }
 
     @Test
@@ -52,7 +64,7 @@ class StepsManagerTest {
         stepsManager.add(3, 0);
         stepsManager.add(78, -34);
         stepsManager.add(3, Integer.MIN_VALUE);
-        assertEquals("{}", stepsManager.getStats().toString());
+        assertEquals("{}", mapToString(stepsManager));
     }
 
     @Test
@@ -62,7 +74,7 @@ class StepsManagerTest {
         stepsManager.add(3, 323122);
         stepsManager.add(3, Integer.MAX_VALUE);
 
-        assertEquals("{3=" + Integer.MAX_VALUE + "}", stepsManager.getStats().toString());
+        assertEquals("{3=" + Integer.MAX_VALUE + "}", mapToString(stepsManager));
     }
 
     //stepsRecord tests
@@ -259,4 +271,68 @@ class StepsManagerTest {
         p2.add(1, Integer.MAX_VALUE);
         assertTrue(p1.compareTo(p2) < 0);
     }
+
+    //getAllAbove tests
+
+    @Test
+    public void getAllAboveInit(){
+        StepsManager stepsManager = new StepsManager();
+        assertEquals("[]", streamToString(stepsManager.getAllAbove(10)));
+    }
+
+    @Test
+    public void getAllAboveSimple(){
+        StepsManager stepsManager = new StepsManager();
+        stepsManager.add(1, 10);
+        stepsManager.add(3, 11);
+        stepsManager.add(78, 32);
+        assertEquals("[3, 78]", streamToString(stepsManager.getAllAbove(10)));
+    }
+
+    @Test
+    public void getAllAboveEmpty(){
+        StepsManager stepsManager = new StepsManager();
+        stepsManager.add(1, 10);
+        stepsManager.add(3, 11);
+        stepsManager.add(78, 32);
+        assertEquals("[]", streamToString(stepsManager.getAllAbove(100)));
+    }
+
+    @Test
+    public void getAllAboveNegative(){
+        StepsManager stepsManager = new StepsManager();
+        stepsManager.add(-1, 10);
+        stepsManager.add(3, -11);
+        stepsManager.add(0, 32);
+        stepsManager.add(2, 0);
+        assertEquals("[]", streamToString(stepsManager.getAllAbove(-100)));
+    }
+
+    @Test
+    public void getAllAboveStepsNegative(){
+        StepsManager stepsManager = new StepsManager();
+        stepsManager.add(1, 10);
+        stepsManager.add(3, 11);
+        stepsManager.add(78, 32);
+        assertEquals("[1, 3, 78]", streamToString(stepsManager.getAllAbove(-100)));
+    }
+
+    @Test
+    public void getAllAboveStepsZero(){
+        StepsManager stepsManager = new StepsManager();
+        stepsManager.add(1, 1);
+        stepsManager.add(3, 11);
+        stepsManager.add(78, 0);
+        assertEquals("[1, 3]", streamToString(stepsManager.getAllAbove(0)));
+    }
+
+    @Test
+    public void getAllAboveMax(){
+        StepsManager stepsManager = new StepsManager();
+        stepsManager.add(1, 10);
+        stepsManager.add(3, 11);
+        stepsManager.add(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        assertEquals("[]", streamToString(stepsManager.getAllAbove(Integer.MAX_VALUE)));
+    }
+
 }
