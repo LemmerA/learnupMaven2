@@ -1,5 +1,6 @@
 package ru.learnup.javaqa.learnupmvn2.jdbc;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.learnup.javaqa.learnupmvn2.exception.IllegalDayException;
 import ru.learnup.javaqa.learnupmvn2.exception.IllegalStepsException;
@@ -16,6 +17,7 @@ class DbHelperTest {
 
     DbHelper db = new DbHelper(DB_URL, DB_USER, DB_PASS);
 
+    @Disabled
     @Test
     public void getStepsAll() {
         for (Steps steps : db.getAllSteps()){
@@ -23,6 +25,7 @@ class DbHelperTest {
         }
     }
 
+    @Disabled
     @Test
     public void getStepsLogAll() {
         for (StepsLog stepsLog : db.getAllStepsLog()){
@@ -30,12 +33,14 @@ class DbHelperTest {
         }
     }
 
+    @Disabled
     @Test
     public void addStepsSimple() {
         assertEquals(1, db.addSteps(new StepsLog((int)(Math.random()*(365-1+1)+1),
                 (int)(Math.random()*Integer.MAX_VALUE)+1)));
     }
 
+    @Disabled
     @Test
     public void addStepsRewrite() {
         assertEquals(1, db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
@@ -45,6 +50,7 @@ class DbHelperTest {
         assertEquals(1, db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
     }
 
+    @Disabled
     @Test
     public void addStepsNoOverflow() {
         assertEquals(1, db.addSteps(new StepsLog(100, 10)));
