@@ -11,11 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DbHelperTest {
 
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/learnup";
-    private static final String DB_USER = "postgres";
-    private static final String DB_PASS = "postgres";
-
-    DbHelper db = new DbHelper(DB_URL, DB_USER, DB_PASS);
+    DbHelper db = new DbHelper();
 
     @Disabled
     @Test
@@ -24,7 +20,6 @@ class DbHelperTest {
             assertDoesNotThrow(() -> System.out.println(steps.toString()));
         }
     }
-
     @Disabled
     @Test
     public void getStepsLogAll() {
@@ -32,30 +27,27 @@ class DbHelperTest {
             assertDoesNotThrow(() -> System.out.println(stepsLog.toString()));
         }
     }
-
     @Disabled
     @Test
     public void addStepsSimple() {
-        assertEquals(1, db.addSteps(new StepsLog((int)(Math.random()*(365-1+1)+1),
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog((int)(Math.random()*(365-1+1)+1),
                 (int)(Math.random()*Integer.MAX_VALUE)+1)));
     }
-
     @Disabled
     @Test
     public void addStepsRewrite() {
-        assertEquals(1, db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
-        assertEquals(1, db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
-        assertEquals(1, db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
-        assertEquals(1, db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
-        assertEquals(1, db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog(10, (int)(Math.random()*1000)+1)));
     }
-
     @Disabled
     @Test
     public void addStepsNoOverflow() {
-        assertEquals(1, db.addSteps(new StepsLog(100, 10)));
-        assertEquals(1, db.addSteps(new StepsLog(100, Integer.MAX_VALUE)));
-        assertEquals(1, db.addSteps(new StepsLog(100, Integer.MAX_VALUE)));
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog(100, 10)));
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog(100, Integer.MAX_VALUE)));
+        assertDoesNotThrow(() -> db.addSteps(new StepsLog(100, Integer.MAX_VALUE)));
     }
 
     @Test

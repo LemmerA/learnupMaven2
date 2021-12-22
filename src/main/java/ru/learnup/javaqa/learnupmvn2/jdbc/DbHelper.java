@@ -1,114 +1,81 @@
 package ru.learnup.javaqa.learnupmvn2.jdbc;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.Query;
 import ru.learnup.javaqa.learnupmvn2.jdbc.entities.Steps;
 import ru.learnup.javaqa.learnupmvn2.jdbc.entities.StepsLog;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DbHelper {
 
-    private Connection conn;
+    private final SessionFactory sessionFactory;
 
-    public DbHelper (String url, String user, String pass) {
-        try {
-            this.conn = DriverManager.getConnection(url, user, pass);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public DbHelper () {
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                .configure().build();
+        final Metadata metadata = new MetadataSources(registry)
+                .getMetadataBuilder().build();
+        this.sessionFactory = metadata.getSessionFactoryBuilder().build();
     }
 
     public List<Steps> getAllSteps() {
-        try {
-            List<Steps> result = new ArrayList<>();
-            final Statement statement = conn.createStatement();
-            final ResultSet resultSet = statement.executeQuery("SELECT * FROM steps");
-            while (resultSet.next()) {
-                final int id = resultSet.getInt("id");
-                final int day = resultSet.getInt("day");
-                final int steps = resultSet.getInt("steps");
-                final Timestamp dateCreate = resultSet.getTimestamp("date_create");
-                final Timestamp dateUpdate = resultSet.getTimestamp("date_update");
-
-                result.add(
-                        new Steps(id, day, steps, dateCreate, dateUpdate));
-            }
-            return result;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+        try (Session session = sessionFactory.openSession()) {
+            final Query<Steps> result = session.createQuery("from Steps", Steps.class);
+            return result.getResultList();
         }
     }
 
     public List<StepsLog> getAllStepsLog() {
-        try {
-            List<StepsLog> result = new ArrayList<>();
-            final Statement statement = conn.createStatement();
-            final ResultSet resultSet = statement.executeQuery("SELECT * FROM steps_log");
-            while (resultSet.next()) {
-                final int id = resultSet.getInt("id");
-                final int day = resultSet.getInt("day");
-                final int steps = resultSet.getInt("steps");
-                final Timestamp dateCreate = resultSet.getTimestamp("date_create");
-                final boolean isCommitted = resultSet.getBoolean("is_committed");
-
-                result.add(
-                        new StepsLog(id,day, steps, dateCreate, isCommitted));
-            }
-            return result;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
+        try (Session session = sessionFactory.openSession()) {
+            final Query<StepsLog> result = session.createQuery("from StepsLog", StepsLog.class);
+            return result.getResultList();
         }
     }
 
-    public int addSteps(StepsLog steps) {
-        try {
-            final PreparedStatement logQuery = conn.prepareStatement("INSERT INTO steps_log (day, steps, date_create) VALUES (?, ?, ?);");
-            logQuery.setInt(1, steps.getDay());
-            logQuery.setInt(2, steps.getSteps());
-            logQuery.setTimestamp(3, steps.getDateCreate());
+    public void addSteps(StepsLog stepsLog) {
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction logTAction = session.beginTransaction();
+            session.save(stepsLog);
+            logTAction.commit();
 
-            if (logQuery.executeUpdate() == 1) {
-                final PreparedStatement checkQuery = conn.prepareStatement("SELECT * FROM steps WHERE day=?");
-                checkQuery.setInt(1, steps.getDay());
-                ResultSet found = checkQuery.executeQuery();
+            List<Steps> result = session.createQuery("from Steps where day = :day", Steps.class)
+                    .setParameter("day", stepsLog.getDay())
+                    .getResultList();
 
-                if (found.next()) {
-                    final PreparedStatement updQuery = conn.prepareStatement("UPDATE steps SET steps=?, date_update=? WHERE day=?;");
-
-                    try {
-                        updQuery.setInt(1, Math.addExact(found.getInt("steps"), steps.getSteps()));
-                    } catch (ArithmeticException e){
-                        updQuery.setInt(1, Integer.MAX_VALUE);
-                    }
-
-                    updQuery.setTimestamp(2, steps.getDateCreate());
-                    updQuery.setInt(3, steps.getDay());
-                    updQuery.executeUpdate();
-
-                } else {
-                    final PreparedStatement insQuery = conn.prepareStatement("INSERT INTO steps (day, steps, date_create) VALUES (?, ?, ?);");
-                    insQuery.setInt(1, steps.getDay());
-                    insQuery.setInt(2, steps.getSteps());
-                    insQuery.setTimestamp(3, steps.getDateCreate());
-                    insQuery.executeUpdate();
-
+            if (!result.isEmpty()) {
+                Steps steps = result.get(0);
+                try {
+                    steps.setSteps(Math.addExact(steps.getSteps(), stepsLog.getSteps()));
+                } catch (ArithmeticException e) {
+                    steps.setSteps(Integer.MAX_VALUE);
                 }
-                final PreparedStatement logUpdQuery = conn.prepareStatement("UPDATE steps_log SET is_committed=? WHERE day=? AND steps=? AND date_create=?;");
-                logUpdQuery.setBoolean(1, true);
-                logUpdQuery.setInt(2, steps.getDay());
-                logUpdQuery.setInt(3, steps.getSteps());
-                logUpdQuery.setTimestamp(4, steps.getDateCreate());
+                steps.setDateUpdate(stepsLog.getDateCreate());
 
-                return logUpdQuery.executeUpdate();
+                final Transaction updateTAction = session.beginTransaction();
+                session.save(steps);
+                updateTAction.commit();
             } else {
-                return 0;
+                Steps steps = new Steps();
+                steps.setDay(stepsLog.getDay());
+                steps.setSteps(stepsLog.getSteps());
+                steps.setDateCreate(stepsLog.getDateCreate());
+
+                final Transaction createTAction = session.beginTransaction();
+                session.save(steps);
+                createTAction.commit();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return -1;
+
+            final Transaction confirmTAction = session.beginTransaction();
+            stepsLog.setCommitted(true);
+            session.save(stepsLog);
+            confirmTAction.commit();
         }
     }
 }
